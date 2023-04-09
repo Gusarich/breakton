@@ -54,10 +54,10 @@ describe('Flooder', () => {
         });
     });
 
-    it('should accept 100 messages', async () => {
-        await flooder.sendDeploy(deployer.getSender(), toNano('1'));
+    it('should accept 767 messages', async () => {
+        await flooder.sendDeploy(deployer.getSender(), toNano('100'));
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 767; i++) {
             const result = await flooder.sendMessage(i, keypair);
             expect(result.transactions).toHaveTransaction({
                 to: flooder.address,
@@ -66,7 +66,7 @@ describe('Flooder', () => {
         }
     });
 
-    it('should reject messages with wrong seqno', async () => {
+    it('should reject messages with wrong index', async () => {
         await flooder.sendDeploy(deployer.getSender(), toNano('0.05'));
 
         await flooder.sendMessage(0, keypair);
@@ -86,5 +86,25 @@ describe('Flooder', () => {
         const anotherKeypair = keyPairFromSeed(await getSecureRandomBytes(32));
 
         await expect(flooder.sendMessage(1, anotherKeypair)).rejects.toThrow('Error executing transaction');
+    });
+
+    it('should accept 100 messages in random order', async () => {
+        await flooder.sendDeploy(deployer.getSender(), toNano('100'));
+        let indexes = [];
+        for (let i = 0; i < 2; i++) indexes.push(i);
+
+        for (let i = indexes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+        }
+
+        for (const index of indexes) {
+            const result = await flooder.sendMessage(index, keypair);
+            console.log(result);
+            expect(result.transactions).toHaveTransaction({
+                to: flooder.address,
+                success: true,
+            });
+        }
     });
 });

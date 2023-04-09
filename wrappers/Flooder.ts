@@ -6,7 +6,7 @@ export type FlooderConfig = {
 };
 
 export function flooderConfigToCell(config: FlooderConfig): Cell {
-    return beginCell().storeUint(0, 16).storeBuffer(config.publicKey, 32).endCell();
+    return beginCell().storeUint(0, 767).storeBuffer(config.publicKey, 32).endCell();
 }
 
 export class Flooder implements Contract {
@@ -30,9 +30,9 @@ export class Flooder implements Contract {
         });
     }
 
-    async sendMessage(provider: ContractProvider, seqno: number, keypair: KeyPair) {
-        const seqnoCellHash = beginCell().storeUint(seqno, 16).endCell().hash();
-        const signature = sign(seqnoCellHash, keypair.secretKey);
-        await provider.external(beginCell().storeBuffer(signature).storeUint(seqno, 16).endCell());
+    async sendMessage(provider: ContractProvider, index: number, keypair: KeyPair) {
+        const indexCellHash = beginCell().storeUint(index, 10).endCell().hash();
+        const signature = sign(indexCellHash, keypair.secretKey);
+        await provider.external(beginCell().storeBuffer(signature).storeUint(index, 10).endCell());
     }
 }
