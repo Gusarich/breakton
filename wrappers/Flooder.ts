@@ -6,7 +6,7 @@ export type FlooderConfig = {
 };
 
 export function flooderConfigToCell(config: FlooderConfig): Cell {
-    return beginCell().storeBuffer(config.publicKey, 32).endCell();
+    return beginCell().storeUint(0, 16).storeBuffer(config.publicKey, 32).endCell();
 }
 
 export class Flooder implements Contract {
